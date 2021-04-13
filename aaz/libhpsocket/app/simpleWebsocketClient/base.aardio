@@ -50,6 +50,7 @@ class base{
 		this.listener.threadGlobal = {
 			__handler__ = this.__handler__;
 			__onThreadCreated__ = this.onThreadCreated;
+			__sessionId__ = this.__sessionId__;
 		}
 
 		this.listener.onThreadCreated = function(){
@@ -59,16 +60,11 @@ class base{
 
 		this.listener.onHandShake = function(component, connId){
 			aaz.libhpsocket.app.simpleWebsocketClient.base.sendWsUpgradeRequest(component);
-			
 		}
 		
 		this.listener.onUpgrade = function(component, connId, upgradeType){
-			if(1!= upgradeType){
-				return 2; 
-			}
-			if(!aaz.libhpsocket.app.simpleWebsocketClient.base.checkWsUpgradeResponse(component)){
-				return 2; 
-			}
+			if(upgradeType != 1) return 2; 
+			if(!aaz.libhpsocket.app.simpleWebsocketClient.base.checkWsUpgradeResponse(component)) return 2; 
 			if __handler__.onOpen __handler__.onOpen();
 		}
 		
@@ -185,23 +181,20 @@ namespace base{
 	}
 	
 	onWsMessageBody = function(component, pData, len){
-		if(!component.extra){
-			return ; 
-		}
+		if(!component.extra) return ;
 		var userData = getUserdata(component);
 		userData.concatWsMessage(pData, len);
 		userData.save();
 	}
 	
 	onWsMessageComplete = function(component){
-		if(opCode == 0x9){
+		var wsState = component.getWsMessageState();
+		if(wsState[["opCode"]] == 0x9){
 			..aaz.libhpsocket.helper.httpClient.sendWsPong(component);
 			return ; 
 		}
 		
-		if(!component.extra){
-			return ; 
-		}
+		if(!component.extra) return ; 
 		var userData = getUserdata(component);
 		return userData.getWsMessage();
 	}

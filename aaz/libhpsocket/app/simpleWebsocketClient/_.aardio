@@ -13,6 +13,7 @@ class simpleWebsocketClient{
 			this.scheme = t.scheme;
 			return this[t.scheme].connect(url); 
 		}
+		error("传入了不支持的 url，url 请以 ws 或 wss 开头", 2);
 	};
 	send = function(msg){
 		return this[this.scheme].send(msg); 
@@ -49,11 +50,17 @@ namespace simpleWebsocketClient{
 				owner.ws.origin = v;
 				owner.wss.origin = v;
 			}
-		}
+		};
 		onThreadCreated = {
 			_set = function(v){
 				owner.ws.onThreadCreated = v;
 				owner.wss.onThreadCreated = v;
+			}
+		}
+		sessionId = {
+			_set = function(v){
+				owner.ws.__sessionId__ = v;
+				owner.wss.__sessionId__ = v;
 			}
 		}
     );
